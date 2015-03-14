@@ -1,0 +1,57 @@
+** About
+
+This package provides a minor mode (=emms-status-mode=) for displaying
+description and playing time of the current track played by [[http://www.gnu.org/software/emms/][EMMS]] in the
+mode line.  It is intended to be used as a substitution for
+=emms-playing-time= and =emms-mode-line= modes.
+
+There are 2 main differences between =emms-status-mode= and
+=emms-playing-time= + =emms-mode-line= modes:
+
+1. =emms-status-mode= displays an additional symbol (⏵/⏸/⏹ by default)
+   to show if the current track is being played/paused/stopped.
+
+2. If a track is more than an hour long, its playing time would be
+   displayed in a form H:MM:SS instead of MM:SS.
+
+For example, =emms-status-mode= will display a paused track like this:
+
+: ⏸ 1:42:37(3:31:05) John Smith - My very long and boring song
+
+While with =emms-playing-time= + =emms-mode-line= modes, it will be:
+
+: John Smith - My very long and boring song 102:37/211:05
+
+And of course the default displayed string may be customized (see
+=emms-status-mode-line-string= variable).
+
+** Installation
+
+*** Automatic
+
+The package can be installed using [[https://github.com/quelpa/quelpa][quelpa]] like this:
+
+#+BEGIN_SRC emacs-lisp
+(quelpa '(emms-status :fetcher github :repo "alezost/emms-status.el"))
+#+END_SRC
+
+*** Manual
+
+For the manual installation, clone the repo, add the directory to
+=load-path= and add an autoload for the minor mode:
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "/path/to/emms-status-dir")
+(autoload 'emms-status-mode "emms-status" nil t)
+#+END_SRC
+
+** Usage
+
+Simply =M-x emms-status-mode=, but make sure that =emms-mode-line= mode
+is disabled to avoid double title in your mode-line.
+
+To enable =emms-status-mode= automatically, you may use:
+
+#+BEGIN_SRC emacs-lisp
+(eval-after-load 'emms '(emms-status-mode))
+#+END_SRC
