@@ -29,6 +29,13 @@ And of course the default displayed string may be customized (see
 
 *** Automatic
 
+**** MELPA
+
+This package can be installed from [[http://melpa.org/][MELPA]] (with =M-x package-install= or
+=M-x list-packages=).
+
+**** Quelpa
+
 The package can be installed using [[https://github.com/quelpa/quelpa][quelpa]] like this:
 
 #+BEGIN_SRC emacs-lisp
