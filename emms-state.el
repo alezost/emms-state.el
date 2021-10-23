@@ -1,6 +1,6 @@
 ;;; emms-state.el --- Display track description and playing time in the mode line
 
-;; Copyright © 2015, 2016 Alex Kost
+;; Copyright © 2015, 2016, 2021 Alex Kost
 
 ;; Author: Alex Kost <alezost@gmail.com>
 ;; Created: 22 Jan 2015
@@ -82,16 +82,18 @@
   :group 'emms-state)
 
 (defvar emms-state-mode-line-string
-  '(" " emms-state " "
-    (emms-state-current-playing-time
-     (:propertize emms-state-current-playing-time
-                  face emms-state-current-playing-time))
-    (emms-state-total-playing-time
-     ("("
-      (:propertize emms-state-total-playing-time
-                   face emms-state-total-playing-time)
-      ")"))
-    emms-mode-line-string)
+  '(emms-state
+    (" " emms-state
+     (emms-state-current-playing-time
+      (" "
+       (:propertize emms-state-current-playing-time
+                    face emms-state-current-playing-time)))
+     (emms-state-total-playing-time
+      ("("
+       (:propertize emms-state-total-playing-time
+                    face emms-state-total-playing-time)
+       ")"))
+     emms-mode-line-string))
   "Mode line string with the EMMS info.")
 (put 'emms-state-mode-line-string 'risky-local-variable t)
 
