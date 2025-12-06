@@ -168,7 +168,7 @@ Optional argument is used to be compatible with
 (defun emms-state-playing-time-update ()
   "Update the current playing time in the mode line."
   (emms-state-set-current-playing-time)
-  (force-mode-line-update))
+  (force-mode-line-update 'all))
 
 (defun emms-state-playing-time-start ()
   "Start displaying the current playing time."
@@ -215,7 +215,6 @@ and `emms-playing-time'."
       (emms-mode-line-restore-titlebar)
       (emms-state-toggle-mode-line -1))
 
-    (force-mode-line-update)
     (setq emms-mode-line-active-p activep
           emms-playing-time-p activep
           emms-playing-time-display-p activep)
@@ -273,7 +272,7 @@ playing timer will still go on."
     (setq global-mode-string
           (remove 'emms-state-mode-line-string
                   global-mode-string)))
-  (force-mode-line-update))
+  (force-mode-line-update 'all))
 
 (provide 'emms-state)
 
