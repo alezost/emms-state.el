@@ -109,7 +109,8 @@
 (defun emms-state-format-time (time)
   "Convert TIME into a human readable string.
 TIME is a number of seconds."
-  (let* ((minutes (/ time 60))
+  (let* ((time    (round time))
+         (minutes (/ time 60))
          (seconds (% time 60))
          (hours   (/ minutes 60))
          (minutes (% minutes 60)))
