@@ -1,6 +1,6 @@
-;;; emms-state.el --- Display track description and playing time in the mode line
+;;; emms-state.el --- Display EMMS track description and playing time in the mode line  -*- lexical-binding: t -*-
 
-;; Copyright © 2015, 2016, 2021 Alex Kost
+;; Copyright © 2015–2025 Alex Kost
 
 ;; Author: Alex Kost <alezost@gmail.com>
 ;; Created: 22 Jan 2015
@@ -13,12 +13,12 @@
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
 ;; (at your option) any later version.
-
+;;
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
-
+;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -67,17 +67,17 @@
   :group 'emms-state)
 
 (defcustom emms-state-play "⏵"
-  "String used to denote the 'play' state."
+  "String used to denote the `play' state."
   :type 'string
   :group 'emms-state)
 
 (defcustom emms-state-pause "⏸"
-  "String used to denote the 'pause' state."
+  "String used to denote the `pause' state."
   :type 'string
   :group 'emms-state)
 
 (defcustom emms-state-stop "⏹"
-  "String used to denote the 'stop' state."
+  "String used to denote the `stop' state."
   :type 'string
   :group 'emms-state)
 
@@ -151,7 +151,7 @@ Optional argument is used to be compatible with
   "Start timer for the current playing time."
   (unless emms-playing-time-display-timer
     (setq emms-playing-time-display-timer
-          (run-at-time t 1 'emms-state-playing-time-step))))
+          (run-at-time t 1 #'emms-state-playing-time-step))))
 
 (defun emms-state-timer-stop ()
   "Stop timer for the current playing time."
@@ -203,12 +203,12 @@ and `emms-playing-time'."
     (if emms-state-mode
         ;; Turn on.
         (progn
-          (setq hook-action 'add-hook
+          (setq hook-action #'add-hook
                 activep t)
           (when emms-player-playing-p (emms-mode-line-alter))
           (emms-state-toggle-mode-line 1))
       ;; Turn off.
-      (setq hook-action 'remove-hook
+      (setq hook-action #'remove-hook
             activep nil)
       (emms-state-playing-time-stop)
       (emms-mode-line-restore-titlebar)
@@ -220,36 +220,36 @@ and `emms-playing-time'."
           emms-playing-time-display-p activep)
 
     (funcall hook-action 'emms-track-updated-functions
-             'emms-mode-line-alter)
+             #'emms-mode-line-alter)
     (funcall hook-action 'emms-player-started-hook
-             'emms-mode-line-alter)
+             #'emms-mode-line-alter)
 
     (funcall hook-action 'emms-track-updated-functions
-             'emms-state-set-total-playing-time)
+             #'emms-state-set-total-playing-time)
     (funcall hook-action 'emms-player-started-hook
-             'emms-state-set-total-playing-time)
+             #'emms-state-set-total-playing-time)
 
     (funcall hook-action 'emms-player-started-hook
-             'emms-state-set-state)
+             #'emms-state-set-state)
     (funcall hook-action 'emms-player-stopped-hook
-             'emms-state-set-state)
+             #'emms-state-set-state)
     (funcall hook-action 'emms-player-finished-hook
-             'emms-state-set-state)
+             #'emms-state-set-state)
     (funcall hook-action 'emms-player-paused-hook
-             'emms-state-set-state)
+             #'emms-state-set-state)
 
     (funcall hook-action 'emms-player-started-hook
-             'emms-state-playing-time-start)
+             #'emms-state-playing-time-start)
     (funcall hook-action 'emms-player-stopped-hook
-             'emms-state-playing-time-stop)
+             #'emms-state-playing-time-stop)
     (funcall hook-action 'emms-player-finished-hook
-             'emms-state-playing-time-stop)
+             #'emms-state-playing-time-stop)
     (funcall hook-action 'emms-player-paused-hook
-             'emms-state-playing-time-pause)
+             #'emms-state-playing-time-pause)
     (funcall hook-action 'emms-player-seeked-functions
-             'emms-state-playing-time-seek)
+             #'emms-state-playing-time-seek)
     (funcall hook-action 'emms-player-time-set-functions
-             'emms-state-playing-time-set)))
+             #'emms-state-playing-time-set)))
 
 (defun emms-state-toggle-mode-line (&optional arg)
   "Toggle displaying EMMS status info in the mode line.
