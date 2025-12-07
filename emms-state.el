@@ -219,7 +219,7 @@ and `emms-playing-time'."
       ;; Turn off.
       (setq hook-action #'remove-hook
             activep nil)
-      (emms-state-playing-time-stop)
+      (emms-state-timer-stop)
       (emms-mode-line-restore-titlebar)
       (emms-state-toggle-mode-line -1))
 
