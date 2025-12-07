@@ -182,7 +182,8 @@ Optional argument is used to be compatible with
 
 (defun emms-state-playing-time-pause ()
   "Pause displaying the current playing time."
-  (if emms-player-paused-p
+  (if (or emms-player-paused-p
+          (not emms-player-playing-p))
       (emms-state-timer-stop)
     (emms-state-timer-start)))
 
