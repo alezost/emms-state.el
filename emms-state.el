@@ -187,8 +187,15 @@ Optional argument is used to be compatible with
       (emms-state-timer-stop)
     (emms-state-timer-start)))
 
-(defalias 'emms-state-playing-time-seek 'emms-playing-time-seek)
-(defalias 'emms-state-playing-time-set 'emms-playing-time-set)
+(defun emms-state-playing-time-seek (sec)
+  "Update playing time after seeking for SEC forward or backward."
+  (emms-playing-time-seek sec)
+  (emms-state-playing-time-update))
+
+(defun emms-state-playing-time-set (sec)
+  "Update playing time after it was set to SEC."
+  (emms-playing-time-set sec)
+  (emms-state-playing-time-update))
 
 
 ;;; Commands
