@@ -208,24 +208,18 @@ This mode is intended to be a substitution for `emms-mode-line'
 and `emms-playing-time'."
   :global t
   (or global-mode-string (setq global-mode-string '("")))
-  (let (hook-action activep)
+  (let ((hook-action nil))
     (if emms-state-mode
         ;; Turn on.
         (progn
-          (setq hook-action #'add-hook
-                activep t)
+          (setq hook-action #'add-hook)
           (when emms-player-playing-p (emms-mode-line-alter))
           (emms-state-toggle-mode-line 1))
       ;; Turn off.
-      (setq hook-action #'remove-hook
-            activep nil)
+      (setq hook-action #'remove-hook)
       (emms-state-timer-stop)
       (emms-mode-line-restore-titlebar)
       (emms-state-toggle-mode-line -1))
-
-    (setq emms-mode-line-active-p activep
-          emms-playing-time-p activep
-          emms-playing-time-display-p activep)
 
     (funcall hook-action 'emms-track-updated-functions
              #'emms-mode-line-alter)
