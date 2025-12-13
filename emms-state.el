@@ -130,6 +130,23 @@ TIME is a number of seconds."
   "Update the value of `emms-state' variable."
   (setq emms-state (emms-state)))
 
+(defun emms-state-set-track (&optional _track)
+  "Update the value of `emms-mode-line-string' and title.
+This is the same as `emms-mode-line-alter', except it updates even if
+`emms-player-playing-p' is nil."
+  (when emms-mode-line-mode-line-function
+    (setq emms-mode-line-string
+          (if emms-playlist-buffer
+	      (funcall emms-mode-line-mode-line-function)
+            ;; Don't call `emms-mode-line-mode-line-function' in this
+            ;; case because its default value,
+            ;; `emms-mode-line-playlist-current', calls
+            ;; `emms-playlist-current-selected-track' which will create
+            ;; default playlist.  Creating playlists is not what
+            ;; `emms-state' should do.
+            " (no playlist)")))
+  (emms-mode-line-alter-titlebar))
+
 (defun emms-state-set-total-playing-time (&optional _)
   "Update the value of `emms-state-total-playing-time' variable.
 Optional argument is used to be compatible with
@@ -181,7 +198,7 @@ Optional argument is used to be compatible with
   (emms-state-timer-stop))
 
 (defun emms-state-playing-time-pause ()
-  "Pause displaying the current playing time."
+  "Pause or unpause displaying playing time depending on EMMS player state."
   (if (or emms-player-paused-p
           (not emms-player-playing-p))
       (emms-state-timer-stop)
@@ -222,9 +239,11 @@ and `emms-playing-time'."
       (emms-state-toggle-mode-line -1))
 
     (funcall hook-action 'emms-track-updated-functions
-             #'emms-mode-line-alter)
+             #'emms-state-set-track)
     (funcall hook-action 'emms-player-started-hook
-             #'emms-mode-line-alter)
+             #'emms-state-set-track)
+    (funcall hook-action 'emms-player-finished-hook
+             #'emms-state-set-track)
 
     (funcall hook-action 'emms-track-updated-functions
              #'emms-state-set-total-playing-time)
