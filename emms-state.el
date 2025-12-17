@@ -118,17 +118,18 @@ TIME is a number of seconds."
         (format "%d:%02d" minutes seconds)
       (format "%d:%02d:%02d" hours minutes seconds))))
 
-(defun emms-state ()
-  "Return string displaying the state of the current EMMS process."
+(defun emms-state-set-state ()
+  "Update `emms-state' and playing time."
   (if emms-player-playing-p
       (if emms-player-paused-p
-          emms-state-pause
-        emms-state-play)
-    emms-state-stop))
-
-(defun emms-state-set-state ()
-  "Update the value of `emms-state' variable."
-  (setq emms-state (emms-state)))
+          (progn
+            (setq emms-state emms-state-pause)
+            (emms-state-timer-stop))
+        (setq emms-state emms-state-play)
+        (emms-state-timer-start))
+    (setq emms-state emms-state-stop
+          emms-state-current-playing-time nil)
+    (emms-state-timer-stop)))
 
 (defun emms-state-set-track (&optional _track)
   "Update the value of `emms-mode-line-string' and title.
@@ -159,8 +160,7 @@ Optional argument is used to be compatible with
 (defun emms-state-set-current-playing-time ()
   "Update the value of `emms-state-current-playing-time' variable."
   (setq emms-state-current-playing-time
-        (unless (zerop emms-playing-time)
-          (emms-state-format-time emms-playing-time))))
+        (emms-state-format-time emms-playing-time)))
 
 
 ;;; Playing time functions for hooks
@@ -187,22 +187,10 @@ Optional argument is used to be compatible with
   (emms-state-set-current-playing-time)
   (force-mode-line-update 'all))
 
-(defun emms-state-playing-time-start ()
-  "Start displaying the current playing time."
+(defun emms-state-playing-time-reset ()
+  "Set `emms-playing-time' to zero."
   (setq emms-playing-time 0)
-  (emms-state-timer-start))
-
-(defun emms-state-playing-time-stop ()
-  "Stop displaying the current playing time."
-  (setq emms-playing-time 0)
-  (emms-state-timer-stop))
-
-(defun emms-state-playing-time-pause ()
-  "Pause or unpause displaying playing time depending on EMMS player state."
-  (if (or emms-player-paused-p
-          (not emms-player-playing-p))
-      (emms-state-timer-stop)
-    (emms-state-timer-start)))
+  (emms-state-set-current-playing-time))
 
 (defun emms-state-playing-time-seek (sec)
   "Update playing time after seeking for SEC forward or backward."
@@ -260,13 +248,7 @@ and `emms-playing-time'."
              #'emms-state-set-state)
 
     (funcall hook-action 'emms-player-started-hook
-             #'emms-state-playing-time-start)
-    (funcall hook-action 'emms-player-stopped-hook
-             #'emms-state-playing-time-stop)
-    (funcall hook-action 'emms-player-finished-hook
-             #'emms-state-playing-time-stop)
-    (funcall hook-action 'emms-player-paused-hook
-             #'emms-state-playing-time-pause)
+             #'emms-state-playing-time-reset)
     (funcall hook-action 'emms-player-seeked-functions
              #'emms-state-playing-time-seek)
     (funcall hook-action 'emms-player-time-set-functions
