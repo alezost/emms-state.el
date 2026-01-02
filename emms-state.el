@@ -234,7 +234,14 @@ and `emms-playing-time'."
         ;; Turn on.
         (progn
           (setq hook-action #'add-hook)
-          (when emms-player-playing-p (emms-mode-line-alter))
+          ;; Ideally, we should synchronize `emms-playing-time' here
+          ;; but EMMS doesn't provide a way to get time from player.
+          ;; The only way is to call `emms-seek-to' or similar
+          ;; command to trigger `emms-player-seeked-functions' or
+          ;; `emms-player-time-set-functions'.
+          (emms-state-playing-time-reset)
+          (emms-state-set-state)
+          (emms-state-set-track)
           (emms-state-toggle-mode-line 1))
       ;; Turn off.
       (setq hook-action #'remove-hook)
