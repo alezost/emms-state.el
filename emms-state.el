@@ -1,6 +1,6 @@
 ;;; emms-state.el --- Display EMMS track description and playing time in the mode line  -*- lexical-binding: t -*-
 
-;; Copyright © 2015–2025 Alex Kost
+;; Copyright © 2015–2026 Alex Kost
 
 ;; Author: Alex Kost <alezost@gmail.com>
 ;; Created: 22 Jan 2015
@@ -131,31 +131,47 @@ TIME is a number of seconds."
           emms-state-current-playing-time nil)
     (emms-state-timer-stop)))
 
-(defun emms-state-set-track (&optional _track)
+(defun emms-state-set-track (&optional track)
   "Update the value of `emms-mode-line-string' and title.
-This is the same as `emms-mode-line-alter', except it updates even if
-`emms-player-playing-p' is nil."
-  (when emms-mode-line-mode-line-function
-    (setq emms-mode-line-string
-          (if emms-playlist-buffer
-	      (funcall emms-mode-line-mode-line-function)
-            ;; Don't call `emms-mode-line-mode-line-function' in this
-            ;; case because its default value,
-            ;; `emms-mode-line-playlist-current', calls
-            ;; `emms-playlist-current-selected-track' which will create
-            ;; default playlist.  Creating playlists is not what
-            ;; `emms-state' should do.
-            " (no playlist)")))
-  (emms-mode-line-alter-titlebar))
 
-(defun emms-state-set-total-playing-time (&optional _)
-  "Update the value of `emms-state-total-playing-time' variable.
+This is similar to `emms-mode-line-alter', except it updates even if
+`emms-player-playing-p' is nil.
+
 Optional argument is used to be compatible with
 `emms-track-updated-functions'."
-  (let ((time (emms-track-get (emms-playlist-current-selected-track)
-                              'info-playing-time)))
-    (setq emms-state-total-playing-time
-          (and time (emms-state-format-time time)))))
+  ;; When you add new tracks to playlist, EMMS calls
+  ;; `emms-track-initialize-functions' which has
+  ;; `emms-info-initialize-track' by default and eventually triggers
+  ;; `emms-track-updated-functions', so `emms-state-set-track' and other
+  ;; functions from `emms-track-updated-functions' are called for every
+  ;; added track!  That's why we do nothing if TRACK is not the current
+  ;; track.
+  (when (or (null track)
+            (eq track (emms-playlist-current-selected-track)))
+    (when emms-mode-line-mode-line-function
+      (setq emms-mode-line-string
+            (if emms-playlist-buffer
+	        (funcall emms-mode-line-mode-line-function)
+              ;; Don't call `emms-mode-line-mode-line-function' in this
+              ;; case because its default value,
+              ;; `emms-mode-line-playlist-current', calls
+              ;; `emms-playlist-current-selected-track' which will create
+              ;; default playlist.  Creating playlists is not what
+              ;; `emms-state' should do.
+              " (no playlist)")))
+    (emms-mode-line-alter-titlebar)))
+
+(defun emms-state-set-total-playing-time (&optional track)
+  "Update the value of `emms-state-total-playing-time'.
+Optional argument is used to be compatible with
+`emms-track-updated-functions'."
+  ;; See commentary for `emms-state-set-track'.
+  (when (or (and (null track)
+                 (setq track (emms-playlist-current-selected-track)))
+            (eq track (emms-playlist-current-selected-track)))
+    (let ((time (emms-track-get track 'info-playing-time)))
+      (setq emms-state-total-playing-time
+            (and time (emms-state-format-time time))))))
 
 (defun emms-state-set-current-playing-time ()
   "Update the value of `emms-state-current-playing-time' variable."
